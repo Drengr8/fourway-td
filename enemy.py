@@ -1,6 +1,8 @@
 from const import *
 from const import Direction
 from groups import *
+from pathfinding import astar_pathfinding
+import pygame
 
 
 class BaseEnemy(pygame.sprite.Sprite):
@@ -29,22 +31,18 @@ class BaseEnemy(pygame.sprite.Sprite):
                 x = ROAD_LENGTH + ENEMY_SIZE // 2 + self.road * GRIDS_INTERVAL
                 y = 0 - ENEMY_SIZE // 2
                 self.y_limit = ROAD_LENGTH - ENEMY_SIZE // 2
-                self.base_speed = Direction.DOWN.to_vector()
             case Direction.DOWN:
                 x = ROAD_LENGTH + ENEMY_SIZE // 2 + self.road * GRIDS_INTERVAL
                 y = WIN_SIZE + ENEMY_SIZE // 2
                 self.y_limit = WIN_SIZE - ROAD_LENGTH + ENEMY_SIZE // 2
-                self.base_speed = Direction.UP.to_vector()
             case Direction.LEFT:
                 x = 0 - ENEMY_SIZE // 2
                 y = ROAD_LENGTH + ENEMY_SIZE // 2 + self.road * GRIDS_INTERVAL
                 self.x_limit = ROAD_LENGTH - ENEMY_SIZE // 2
-                self.base_speed = Direction.RIGHT.to_vector()
             case Direction.RIGHT:
                 x = WIN_SIZE + ENEMY_SIZE // 2
                 y = ROAD_LENGTH + ENEMY_SIZE // 2 + self.road * GRIDS_INTERVAL
                 self.x_limit = WIN_SIZE - ROAD_LENGTH + ENEMY_SIZE // 2
-                self.base_speed = Direction.LEFT.to_vector()
 
         self.pos = pygame.Vector2(x, y)
         self.speed_modifier = speed_factor
@@ -55,6 +53,61 @@ class BaseEnemy(pygame.sprite.Sprite):
         self.init_time = pygame.time.get_ticks()
 
         self.buff = {}
+        # Pathfinding
+        self.path = self.calculate_path()
+        self.path_index = 0
+        self.reached_goal = False
+
+    def world_to_grid(self, pos):
+        # Convert world position to grid coordinates
+        # Use the same logic as Grids for placement
+        grids_instance = None
+        for g in grid:
+            grids_instance = g
+            break
+        if not grids_instance:
+            return (0, 0)
+        rel = pos - grids_instance.top_left_pos
+        x = int(rel.y // GRIDS_INTERVAL)
+        y = int(rel.x // GRIDS_INTERVAL)
+        return (x, y)
+
+    def grid_to_world(self, coord):
+        # Convert grid coordinates to world position (center of cell)
+        grids_instance = None
+        for g in grid:
+            grids_instance = g
+            break
+        if not grids_instance:
+            return pygame.Vector2(0, 0)
+        x, y = coord
+        return grids_instance.top_left_pos + pygame.Vector2(GRIDS_INTERVAL * (y + 0.5), GRIDS_INTERVAL * (x + 0.5))
+
+    def get_goal(self):
+        # For now, goal is the cell on the opposite edge
+        if self.side == Direction.UP:
+            return (EDGES - 1, self.road)
+        elif self.side == Direction.DOWN:
+            return (0, self.road)
+        elif self.side == Direction.LEFT:
+            return (self.road, EDGES - 1)
+        elif self.side == Direction.RIGHT:
+            return (self.road, 0)
+        else:
+            return (EDGES // 2, EDGES // 2)
+
+    def calculate_path(self):
+        grids_instance = None
+        for g in grid:
+            grids_instance = g
+            break
+        if not grids_instance:
+            return []
+        nav_map = grids_instance.navigation_map
+        start = self.world_to_grid(self.pos)
+        goal = self.get_goal()
+        path = astar_pathfinding(nav_map, start, goal)
+        return path if path else []
 
     def blink(
         self, *, x: float = 0, y: float = 0, by_x: bool = False, by_y: bool = False
@@ -77,23 +130,31 @@ class BaseEnemy(pygame.sprite.Sprite):
         RESOURCE.gold += worth
 
     def update(self) -> None:
-        match self.side:
-            case Direction.UP:
-                if self.pos.y > self.y_limit:
-                    RESOURCE.hp -= 1
-                    return
-            case Direction.DOWN:
-                if self.pos.y < self.y_limit:
-                    RESOURCE.hp -= 1
-                    return
-            case Direction.LEFT:
-                if self.pos.x > self.x_limit:
-                    RESOURCE.hp -= 1
-                    return
-            case Direction.RIGHT:
-                if self.pos.x < self.x_limit:
-                    RESOURCE.hp -= 1
-                    return
+        if self.reached_goal or not self.path or self.path_index >= len(self.path):
+            return
+        # Move toward next cell in path
+        target_coord = self.path[self.path_index]
+        target_pos = self.grid_to_world(target_coord)
+        direction = (target_pos - self.pos)
+        distance = direction.length()
+        if distance < 1:
+            # Arrived at this cell, go to next
+            self.path_index += 1
+            if self.path_index >= len(self.path):
+                # Reached goal
+                self.reached_goal = True
+                RESOURCE.hp -= 1
+                self.kill()
+                return
+            target_coord = self.path[self.path_index]
+            target_pos = self.grid_to_world(target_coord)
+            direction = (target_pos - self.pos)
+            distance = direction.length()
+        if distance != 0:
+            direction = direction.normalize()
+        else:
+            direction = pygame.Vector2(0, 0)
+        # Apply buffs
         if "cold" in self.buff:
             if pygame.time.get_ticks() - self.buff["cold"] < 500:
                 cold_modifier = 0.5
@@ -102,7 +163,7 @@ class BaseEnemy(pygame.sprite.Sprite):
                 cold_modifier = 1
         else:
             cold_modifier = 1
-        self.pos += self.base_speed * self.speed_modifier * cold_modifier
+        self.pos += direction * self.speed_modifier * cold_modifier
         self.rect.center = self.pos
 
 
@@ -191,3 +252,10 @@ class TestEnemy2(BaseEnemy):
                             splits.blink(by_x=True, x=self.pos.x)
                         enemy_test.add(splits)
             self.kill()
+
+
+def recalculate_paths():
+    for enemy in enemy_test:
+        enemy.path = enemy.calculate_path()
+        enemy.path_index = 0
+        enemy.reached_goal = False

@@ -1,4 +1,6 @@
 from tower import *
+from enemy import recalculate_paths
+from typing import Optional
 
 
 class Grids(pygame.sprite.Sprite):
@@ -10,6 +12,9 @@ class Grids(pygame.sprite.Sprite):
         self.interval = pygame.Vector2(GRIDS_INTERVAL)
         self.top_left_pos = (V_SIZE - pygame.Vector2(size)) / 2
         self.rect = self.image.get_rect(center=pygame.Vector2(V_SIZE) / 2)
+        self.edges = edges
+        # Navigation map: 2D array, True=walkable, False=blocked
+        self.navigation_map = [[True for _ in range(edges)] for _ in range(edges)]
         for e in range(0, edges + 1):
             pygame.draw.line(
                 self.image,
@@ -39,11 +44,22 @@ class Grids(pygame.sprite.Sprite):
             pos = self.top_left_pos + pygame.Vector2(
                 GRIDS_INTERVAL * (0.5 + y), GRIDS_INTERVAL * (0.5 + x)
             )
-            grids.add(Grid(pos=pos, coordinate=coordinate))
+            grids.add(Grid(pos=pos, coordinate=coordinate, parent=self))
+
+    def set_blocked(self, x, y, blocked=True):
+        self.navigation_map[x][y] = not blocked
+
+    def is_walkable(self, x, y):
+        return self.navigation_map[x][y]
+
+    def reset_navigation_map(self):
+        for x in range(self.edges):
+            for y in range(self.edges):
+                self.navigation_map[x][y] = True
 
 
 class Grid(pygame.sprite.Sprite):
-    def __init__(self, pos: pygame.Vector2, coordinate: tuple) -> None:
+    def __init__(self, pos: pygame.Vector2, coordinate: tuple, parent=None) -> None:
         super().__init__()
         self.image = pygame.Surface([GRIDS_INTERVAL, GRIDS_INTERVAL])
         self.image.set_colorkey(Black)
@@ -51,7 +67,8 @@ class Grid(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.image.get_rect(center=self.pos)
         self.cord = coordinate
-        self.tower: BaseTower = None
+        self.tower: Optional[BaseTower] = None
+        self.parent = parent  # Reference to Grids
 
     def available(self, tower: BaseTower):
         if self.tower:
@@ -67,3 +84,9 @@ class Grid(pygame.sprite.Sprite):
             tower.pos = self.pos
             tower.rect.center = self.pos
             tower.placed = True
+            # Mark this cell as blocked in the navigation map
+            if self.parent:
+                x, y = self.cord
+                self.parent.set_blocked(x, y, blocked=True)
+            # Recalculate all enemy paths
+            recalculate_paths()
