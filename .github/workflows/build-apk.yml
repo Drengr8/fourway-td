@@ -10,56 +10,56 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-pip python3-dev git python3 python3-venv build-essential libssl-dev libffi-dev python3-setuptools python3-wheel libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-        sudo apt-get install -y openjdk-17-jdk unzip
-    
-    - name: Install Buildozer
-      run: |
-        pip install buildozer
-        pip install cython==0.29.33
-    
-    - name: Create buildozer.spec
-      run: |
-        cat > buildozer.spec << 'EOF'
-        [app]
-        title = FourWayTD
-        package.name = fourwaytd
-        package.domain = org.example
-        source.dir = .
-        source.include_exts = py,png,jpg,kv,atlas
-        version = 0.1
-        requirements = kivy,kivymd,numpy,scipy
-        orientation = portrait
-        fullscreen = 1
-        android.permissions = INTERNET
-        entrypoint = main.py
-        android.arch = armeabi-v7a
-        android.api = 31
-        android.minapi = 21
-        android.ndk = 23b
-        android.sdk = 31
-        android.accept_sdk_license = True
-        android.allow_backup = True
-        EOF
-    
-    - name: Build APK
-      run: |
-        buildozer -v android debug
-    
-    - name: Upload APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: fourwaytd-apk
-        path: bin/*.apk 
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-dev git python3 python3-venv build-essential libssl-dev libffi-dev python3-setuptools python3-wheel libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt-get install -y openjdk-17-jdk unzip
+
+      - name: Install Buildozer
+        run: |
+          pip install buildozer
+          pip install cython==0.29.33
+
+      - name: Create buildozer.spec
+        run: |
+          cat > buildozer.spec << 'EOF'
+          [app]
+          title = FourWayTD
+          package.name = fourwaytd
+          package.domain = org.example
+          source.dir = .
+          source.include_exts = py,png,jpg,kv,atlas
+          version = 0.1
+          requirements = kivy,kivymd,numpy,scipy
+          orientation = portrait
+          fullscreen = 1
+          android.permissions = INTERNET
+          entrypoint = main.py
+          android.arch = armeabi-v7a
+          android.api = 31
+          android.minapi = 21
+          android.ndk = 23b
+          android.sdk = 31
+          android.accept_sdk_license = True
+          android.allow_backup = True
+          EOF
+
+      - name: Build APK
+        run: |
+          buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: fourwaytd-apk
+          path: bin/*.apk
