@@ -40,7 +40,7 @@ jobs:
           source.dir = .
           source.include_exts = py,png,jpg,kv,atlas
           version = 0.1
-          requirements = kivy,kivymd,numpy
+          requirements = kivy,kivymd
           orientation = portrait
           fullscreen = 1
           android.permissions = INTERNET
