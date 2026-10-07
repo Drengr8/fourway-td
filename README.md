@@ -1,62 +1,64 @@
-# Four-Way Tower Defense Game
+# FourWay TD
 
-A Starcraft-style tower defense game where enemies use pathfinding to navigate around your strategically placed towers.
+**Hold the crossroads.** A four-direction lane tower defense—enemies pathfind in from every side, and every tower you place reshapes the map.
 
-## Features
+[Play overview & launch page →](https://drengr8.github.io/fourway-td/) · [GitHub Actions APK](https://github.com/Drengr8/fourway-td/actions)
 
-- **Grid-based tower placement** - Place towers on a 5x5 grid
-- **A* Pathfinding** - Enemies intelligently navigate around your towers
-- **Dynamic path recalculation** - Enemies find new routes when you place towers
-- **Resource management** - HP and gold system
-- **Touch controls** - Optimized for mobile devices
+## The fantasy
 
-## How to Get the APK
+- **Four fronts** — waves arrive from N / E / S / W, not a single drip lane
+- **Starcraft-minded pathfinding** — towers block; enemies recalculate with A*
+- **Merge & escalate** — stack matching towers to climb tiers (desktop build)
+- **Touch-first** — Android APK via Kivy; desktop pygame prototype for the full loop
 
-### Option 1: GitHub Actions (Recommended)
+## Play
 
-1. **Create a GitHub repository** and push this code to it
-2. **The APK will build automatically** when you push to main/master
-3. **Download the APK** from the Actions tab in your GitHub repository
-4. **Install on your device** or test in Android Studio emulator
+### Desktop (richest prototype)
 
-### Option 2: Google Colab
-
-1. Open the `build_apk_colab.ipynb` file in Google Colab
-2. Upload your project files when prompted
-3. Run all cells to build and download the APK
-
-## Game Controls
-
-- **Tap any grid cell** to place a tower (costs 10 gold)
-- **Towers block enemy movement** - enemies will pathfind around them
-- **Enemies spawn every 2 seconds** from the top row
-- **Lose HP** when enemies reach the bottom
-- **Strategic placement** is key to success!
-
-## Testing
-
-### On Android Device:
-1. Enable "Install from unknown sources" in settings
-2. Transfer and install the APK
-3. Launch the game and start defending!
-
-### In Android Studio:
-1. Start an Android emulator
-2. Drag and drop the APK onto the emulator window
-3. The game will install and launch automatically
-
-## Development
-
-To run locally on desktop:
 ```bash
-pip install kivy kivymd numpy scipy
+pip install -r requirements.txt
+python desktop_main.py
+```
+
+Drag towers onto the 5×5 grid. Merge same-type towers to upgrade. Survive enemies approaching from all four roads.
+
+### Android APK
+
+1. Push to `main` (or run the **Build Android APK** workflow manually)
+2. Download `fourwaytd-apk` from the Actions artifact
+3. Install on device (unknown sources / emulator)
+
+Local mobile entrypoint:
+
+```bash
+pip install -r requirements.txt
 python main.py
 ```
 
-## Files
+Tap the grid to place blocking towers (10 gold). Enemies spawn from all four sides.
 
-- `main.py` - Main game logic and Kivy app
-- `pathfinding.py` - A* pathfinding algorithm
-- `requirements.txt` - Python dependencies
-- `.github/workflows/build-apk.yml` - Automated APK building
-- `build_apk_colab.ipynb` - Manual APK building in Google Colab
+### Colab build
+
+Open `build_apk_colab.ipynb` in Google Colab if you prefer a notebook APK build.
+
+## Controls (quick)
+
+| Surface | Action |
+|--------|--------|
+| Desktop | Drag tower from the tray onto a cell; merge by stacking same type |
+| Mobile | Tap a free cell to place a tower |
+
+Lose HP when an enemy reaches the opposite edge. Gold funds placement.
+
+## Repo map
+
+| File | Role |
+|------|------|
+| `desktop_main.py` | Full pygame prototype (four-way, merges, multiple tower types) |
+| `main.py` | Kivy / Android launch build (four-way pathfinding) |
+| `docs/` | Landing page (GitHub Pages) |
+| `.github/workflows/build-apk.yml` | Automated APK |
+
+## Status
+
+Prototype / early access. Desktop carries the deepest systems; the mobile build focuses on the four-front pathfinding fantasy for a cleaner install path.

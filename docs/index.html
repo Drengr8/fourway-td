@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FourWay TD — Defend every front</title>
+  <meta name="description" content="FourWay TD is a lane tower defense where enemies pathfind in from all four sides. Block lanes, merge towers, hold the crossroads." />
+  <meta property="og:title" content="FourWay TD" />
+  <meta property="og:description" content="A Starcraft-minded tower defense. Four fronts. Real pathfinding. Mobile-ready." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true">
+    <div class="grid-plane"></div>
+    <div class="pulse-ring"></div>
+    <div class="swarm swarm-n"></div>
+    <div class="swarm swarm-e"></div>
+    <div class="swarm swarm-s"></div>
+    <div class="swarm swarm-w"></div>
+  </div>
+
+  <header class="top">
+    <a class="mark" href="#top">FourWay</a>
+    <nav>
+      <a href="#play">Play</a>
+      <a href="#how">How it works</a>
+      <a href="https://github.com/Drengr8/fourway-td" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="brand">FourWay TD</p>
+      <h1>Hold the crossroads.</h1>
+      <p class="lede">Enemies pour in from every side. Place towers that reshape the map, force smarter routes, and keep your base alive.</p>
+      <div class="cta">
+        <a class="btn primary" href="#play">Play now</a>
+        <a class="btn ghost" href="https://github.com/Drengr8/fourway-td/actions" rel="noopener">Get Android APK</a>
+      </div>
+    </section>
+
+    <section class="stage" aria-label="Battlefield preview">
+      <div class="board">
+        <span class="lane lane-n">N</span>
+        <span class="lane lane-e">E</span>
+        <span class="lane lane-s">S</span>
+        <span class="lane lane-w">W</span>
+        <div class="cells" id="cells"></div>
+        <div class="core"></div>
+      </div>
+    </section>
+
+    <section id="how" class="how">
+      <h2>Four fronts. One grid.</h2>
+      <p>This is not a single-lane drip. Waves choose a cardinal direction, then pathfind around the towers you drop. Block a corridor and they find another.</p>
+      <ul class="pillars">
+        <li>
+          <strong>Pathfinding pressure</strong>
+          <span>A* routing recalculates when you place or merge towers—your layout is the puzzle.</span>
+        </li>
+        <li>
+          <strong>Merge &amp; escalate</strong>
+          <span>Stack matching towers to climb tiers and change how you hold a lane.</span>
+        </li>
+        <li>
+          <strong>Built for fingers</strong>
+          <span>Touch-first mobile build via Kivy, plus a full desktop pygame prototype.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="play" class="play">
+      <h2>Launch paths</h2>
+      <p>Pick the surface that matches how you want to play today.</p>
+      <div class="paths">
+        <article>
+          <h3>Desktop prototype</h3>
+          <p>The richest build—four-direction spawns, merge tiers, laser and freeze towers.</p>
+          <pre><code>pip install -r requirements.txt
+python desktop_main.py</code></pre>
+        </article>
+        <article>
+          <h3>Android APK</h3>
+          <p>CI builds a touch-optimized APK from <code>main.py</code>. Download the artifact from Actions after a green run.</p>
+          <a class="btn primary" href="https://github.com/Drengr8/fourway-td/actions" rel="noopener">Open Actions</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>FourWay TD · lane tower defense · MIT</p>
+  </footer>
+
+  <script src="board.js"></script>
+</body>
+</html>

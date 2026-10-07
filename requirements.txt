@@ -1,4 +1,5 @@
 kivy>=2.3.0
 kivymd>=1.1.1
 numpy
-scipy 
+scipy
+pygame>=2.5.0
