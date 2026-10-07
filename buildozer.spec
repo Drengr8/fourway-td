@@ -18,7 +18,7 @@ android.archs = arm64-v8a
 android.api = 33
 # API 26+ exposes getgrent/setgrent needed to compile CPython's grp module.
 android.minapi = 26
-android.ndk = 25b
+android.ndk = 28c
 android.accept_sdk_license = True
 android.allow_backup = True
 android.logcat_filters = *:S python:D
