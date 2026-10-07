@@ -16,7 +16,8 @@ android.permissions = INTERNET
 
 android.archs = arm64-v8a
 android.api = 33
-android.minapi = 24
+# API 26+ exposes getgrent/setgrent needed to compile CPython's grp module.
+android.minapi = 26
 android.ndk = 25b
 android.accept_sdk_license = True
 android.allow_backup = True
