@@ -2,64 +2,57 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
+
+env:
+  PYTHONFORANDROID_PREREQUISITES_INSTALL_INTERACTIVE: "0"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.11"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip python3-dev git python3 python3-venv build-essential libssl-dev libffi-dev python3-setuptools python3-wheel libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev autoconf automake libtool
-          sudo apt-get install -y openjdk-17-jdk unzip
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            autoconf automake libtool libtool-bin libltdl-dev \
+            pkg-config cmake gettext autopoint \
+            build-essential ccache \
+            libffi-dev libssl-dev zlib1g-dev \
+            libncurses-dev
+          # libltdl-dev supplies LT_SYS_SYMBOL_USCORE for the libffi recipe
+          # (same fix as kivy/buildozer#1960).
 
       - name: Install Buildozer
         run: |
-          pip install buildozer
-          pip install cython==0.29.33
-
-      - name: Create buildozer.spec
-        run: |
-          cat > buildozer.spec << 'EOF'
-          [app]
-          title = FourWayTD
-          package.name = fourwaytd
-          package.domain = org.example
-          source.dir = .
-          source.include_exts = py,png,jpg,kv,atlas
-          version = 0.1
-          requirements = kivy,kivymd
-          orientation = portrait
-          fullscreen = 1
-          android.permissions = INTERNET
-          entrypoint = main.py
-          android.arch = armeabi-v7a
-          android.api = 31
-          android.minapi = 21
-          android.ndk = 25b
-          android.sdk = 31
-          android.accept_sdk_license = True
-          android.allow_backup = True
-          EOF
+          python -m pip install -U pip wheel
+          python -m pip install "buildozer==1.6.0" "Cython==0.29.36" virtualenv
 
       - name: Build APK
-        run: |
-          buildozer -v android debug
+        run: buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: fourwaytd-apk
           path: bin/*.apk
+          if-no-files-found: error
