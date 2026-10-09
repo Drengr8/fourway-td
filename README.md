@@ -35,7 +35,16 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Pick Bolt / Frost / Beam from the tray, tap a cell to place, tap the **same type again** to merge up to tier 4. Towers shoot; Frost slows. Enemies approach from all four sides.
+Tray towers ported from the desktop loop:
+
+| Tower | Role | Merge |
+|-------|------|-------|
+| **Cross** | 4-way cardinal minigun | No |
+| **Lance** | Directional lasers; **tap again to rotate**; tiers add beams | Yes → T4 |
+| **Pulse** | Expanding shockwave + freeze | No |
+| **Arc** | Chain lightning (bounces = tier+1) | Yes → T4 |
+
+Cyan **splitter** enemies drop two weaker copies on adjacent lanes when killed. Enemies still approach from all four sides.
 
 ### Colab build
 
@@ -46,7 +55,7 @@ Open `build_apk_colab.ipynb` in Google Colab if you prefer a notebook APK build.
 | Surface | Action |
 |--------|--------|
 | Desktop | Drag tower from the tray onto a cell; merge by stacking same type |
-| Mobile | Select a tower in the tray; tap empty cell to place; tap same type to merge |
+| Mobile | Select tray tower; tap empty cell to place; tap Lance/Arc again to merge; tap Lance to rotate when merge isn’t possible |
 
 Lose HP when an enemy reaches the opposite edge. Gold funds placement and merges.
 
@@ -55,11 +64,11 @@ Lose HP when an enemy reaches the opposite edge. Gold funds placement and merges
 | File | Role |
 |------|------|
 | `desktop_main.py` | Full pygame prototype (four-way, merges, multiple tower types) |
-| `main.py` | Kivy / Android launch build (four-way, merge tiers, combat) |
+| `main.py` | Kivy / Android launch build (four-way + desktop combat port) |
 | `buildozer.spec` | Android packaging config |
 | `docs/` | Landing page (GitHub Pages) |
 | `.github/workflows/build-apk.yml` | Automated APK |
 
 ## Status
 
-Prototype / early access. Mobile now carries four-front pathfinding **and** merge/tier combat; desktop still has the widest tower/bullet toybox.
+Prototype / early access. Mobile carries four-front pathfinding plus the desktop combat set (Cross / Lance / Pulse / Arc, splitter enemies). Desktop remains useful for drag-place feel and visual polish.
